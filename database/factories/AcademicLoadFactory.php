@@ -17,9 +17,9 @@ class AcademicLoadFactory extends Factory
     public function definition(): array
     {
         return [
-            'discipline_id'=>'',
-            'user_id'=>'',
-            'study_group_id'=>''
+            'discipline_id'=>$this->faker->numberBetween(1, 10),
+            'user_id'=>$this->faker->numberBetween(1, 10),
+            'study_group_id'=>$this->faker->numberBetween(1, 10)
         ];
     }
 }

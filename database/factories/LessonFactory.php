@@ -19,8 +19,8 @@ class LessonFactory extends Factory
         return [
             'comment'=>$this->faker->sentence,
             'date_of_lesson'=>$this->faker->dateTime($max = 'now', $timezone = null),
-            'academic_load_id'=>'',
-            'lesson_type_id'=>''
+            'academic_load_id'=>$this->faker->numberBetween(1, 10),
+            'lesson_type_id'=>$this->faker->numberBetween(1, 4)
         ];
     }
 }

@@ -18,10 +18,10 @@ class RatedFactory extends Factory
     {
         return [
             'comment'=>$this->faker->sentence,
-            'mark'=>$this->faker->numberBetween(0, 6),
-            'laboratory_work_id'=>'',
-            'lesson_id'=>'',
-            'user_id'=>''
+            'mark'=>$this->faker->numberBetween(1, 5),
+            'laboratory_work_id'=>$this->faker->numberBetween(1, 10),
+            'lesson_id'=>$this->faker->numberBetween(1, 10),
+            'user_id'=>$this->faker->numberBetween(1, 10)
         ];
     }
 }

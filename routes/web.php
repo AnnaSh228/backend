@@ -14,5 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+   $lessons=\App\Models\lesson::all();
+
+    foreach ($lessons as $lesson) {
+       echo 'Занятие от: '.$lesson['date_of_lesson'].'<br>'; 
+       }
 });
+
+

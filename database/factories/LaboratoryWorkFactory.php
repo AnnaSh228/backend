@@ -19,8 +19,8 @@ class LaboratoryWorkFactory extends Factory
         return [
             'title'=>$this->faker->word,
             'deadline'=>$this->faker->dateTime($max = 'now', $timezone = null),
-            'maximum_score'=>$this->faker->numberBetween(0, 6),
-            'discipline_id'=>''
+            'maximum_score'=>$this->faker->numberBetween(1, 5),
+            'discipline_id'=>$this->faker->numberBetween(1, 10)
         ];
     }
 }
