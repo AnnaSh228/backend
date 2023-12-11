@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('academic_loads', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('discipline_id')->constrained();
-            $table->foreignId('study_group_id')->constrained();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('discipline_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('study_group_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

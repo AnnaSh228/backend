@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->text('comment')->nullable();
             $table->timestamp('date_of_lesson');
-            $table->foreignId('lesson_type_id')->constrained();
-            $table->foreignId('academic_load_id')->constrained();
+            $table->foreignId('lesson_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('academic_load_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

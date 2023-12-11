@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->timestamp('deadline');
             $table->integer('maximum_score');
-            $table->foreignId('discipline_id')->constrained();
+            $table->foreignId('discipline_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

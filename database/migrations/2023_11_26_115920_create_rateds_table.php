@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('mark');
             $table->text('comment')->nullable();
-            $table->foreignId('lesson_id')->constrained();
-            $table->foreignId('laboratory_work_id')->constrained()->nullable();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('lesson_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('laboratory_work_id')->constrained()->nullable()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }
