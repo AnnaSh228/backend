@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLaboratoryWorkRequest;
+use App\Http\Requests\UpdateLaboratoryWorkRequest;
+use App\Http\Resources\LaboratoryWorkResource;
 use Illuminate\Http\Request;
 use App\Models\LaboratoryWork;
 class LaboratoryWorkController extends Controller
@@ -10,19 +13,40 @@ class LaboratoryWorkController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    // public function index()
+    // {
+    //     $laboratory_works = LaboratoryWork::all();
+    //     //dd($disciplines);
+    //     return $laboratory_works;
+    // }
+    public function index(Request $request)
     {
-        $laboratory_works = LaboratoryWork::all();
-        //dd($disciplines);
+        // Проверяем, был ли передан параметр discipline_id в запросе
+        if ($request->has('discipline_id')) {
+            // Если был передан discipline_id, фильтруем данные по этому значению
+            $laboratory_works = LaboratoryWork::where('discipline_id', $request->discipline_id)->get();
+        } else {
+            // Если discipline_id не был передан, просто получаем все лабораторные работы
+            $laboratory_works = LaboratoryWork::all();
+        }
+    
         return $laboratory_works;
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $created_lesson= new LaboratoryWork();
+
+        $created_lesson->title=$request->title;
+        $created_lesson->deadline=$request->deadline;
+        $created_lesson->maximum_score=$request->maximum_score;
+        $created_lesson->discipline_id=$request->discipline_id;
+        $created_lesson->save();
+      
+        return new LaboratoryWorkResource($created_lesson);
     }
 
     /**
@@ -36,9 +60,20 @@ class LaboratoryWorkController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateLaboratoryWorkRequest $request, $id)
     {
-        //
+        $lw = LaboratoryWork::findOrFail($id);
+        $lw->update($request->only("title", "deadline","maximum_score"));
+        return response()->json(["data" => [
+            "success" => true
+        ]]);
+        // $laboratoryWork->update($request->validated());
+        // return new LaboratoryWorkResource($laboratoryWork);
+        
+        // $laboratoryWork = $laboratoryWork->update($request->all()); 
+        // return new LaboratoryWorkResource($laboratoryWork);
+        //$laboratoryWork = $laboratoryWork->update($request->all()); 
+        
     }
 
     /**

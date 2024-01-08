@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\academic_load>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AcademicLoad>
  */
 class AcademicLoadFactory extends Factory
 {
