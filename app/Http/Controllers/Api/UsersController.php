@@ -7,18 +7,29 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('name')->get();
+        // $users = User::orderBy('name')->get();
+        // return UserResource::collection($users);
+        if ($request->has('study_group_id')) {
+
+            $users = User::where('users.study_group_id', $request->study_group_id)
+                ->orderBy('name')
+                ->get();
+
+        } else {
+
+            // $users = User::all();
+        }
+
         return UserResource::collection($users);
-        
-        // return UserResource::collection(User::query()->paginate(20));
 
     }
 
@@ -32,7 +43,7 @@ class UsersController extends Controller
         $user = User::create($data);
 
         return new UserResource($user);
-       //return response(new UserResource($user) , 201)->json
+        //return response(new UserResource($user) , 201)->json
     }
 
     /**

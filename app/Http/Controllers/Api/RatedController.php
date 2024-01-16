@@ -17,27 +17,28 @@ class RatedController extends Controller
     public function index(Request $request)
     {
         $query = Rated::join('users', 'rateds.user_id', '=', 'users.id')
-        ->join('lessons', 'rateds.lesson_id', '=', 'lessons.id')
-        ->join('academic_loads', 'lessons.academic_load_id', '=', 'academic_loads.id');
-    
-    if ($request->has('study_group_id') && $request->has('discipline_id')) {
-        $query->where('users.study_group_id', $request->study_group_id)
-              ->where('academic_loads.discipline_id', $request->discipline_id);
+            ->join('lessons', 'rateds.lesson_id', '=', 'lessons.id')
+            ->join('academic_loads', 'lessons.academic_load_id', '=', 'academic_loads.id');
+
+        if ($request->has('study_group_id') && $request->has('discipline_id')) {
+            $query->where('academic_loads.study_group_id', $request->study_group_id)
+                ->where('academic_loads.discipline_id', $request->discipline_id)
+                ->where('users.study_group_id', $request->study_group_id);
+        }
+
+        $query->orderBy('rateds.id');
+
+        $ratedResources = $query->get([
+            'rateds.id',
+            'rateds.mark',
+            'rateds.lesson_id',
+            'rateds.laboratory_work_id',
+            'rateds.user_id'
+        ]);
+
+        return RatedResource::collection($ratedResources);
     }
-    
-    $query->orderBy('users.name'); // Сортировка по имени пользователя
-    
-    $ratedResources = $query->get([
-        'rateds.id',
-        'rateds.mark',
-        'rateds.lesson_id',
-        'rateds.laboratory_work_id',
-        'rateds.user_id'
-    ]);
-    
-    return RatedResource::collection($ratedResources);
-    }
-    
+
     /**
      * Store a newly created resource in storage.
      */
@@ -46,7 +47,7 @@ class RatedController extends Controller
 
         $newMark = $request->input('mark');
 
-        // Проверяем, если mark равен -1, то устанавливаем laboratory_work_id в null
+
         if ($newMark == -1) {
             $rated = new Rated;
             $rated->laboratory_work_id = null;
@@ -55,19 +56,28 @@ class RatedController extends Controller
             $rated->lesson_id = $request->lesson_id;
             $rated->user_id = $request->user_id;
             $rated->save();
-    
+
             return new RatedResource($rated);
         }
-    
+
         $laboratory_work_id = $request->input('laboratory_work_id');
         $laboratoryWork = LaboratoryWork::find($laboratory_work_id);
-    
+
         if (!$laboratoryWork) {
-            return response()->json(['error' => 'Лабораторная работа не найдена'], 404);
+            //return response()->json(['error' => 'Лабораторная работа не найдена'], 404);
+            $rated = new Rated;
+            $rated->laboratory_work_id = null;
+            $rated->mark = $request->mark;
+            $rated->comment = $request->comment;
+            $rated->lesson_id = $request->lesson_id;
+            $rated->user_id = $request->user_id;
+            $rated->save();
+
+            return new RatedResource($rated);
         }
-    
+
         $score = $laboratoryWork->maximum_score;
-    
+
         if (($newMark <= $score) && ($newMark > 0)) {
             $rated = new Rated;
             $rated->laboratory_work_id = $laboratory_work_id;
@@ -76,7 +86,7 @@ class RatedController extends Controller
             $rated->lesson_id = $request->lesson_id;
             $rated->user_id = $request->user_id;
             $rated->save();
-    
+
             return new RatedResource($rated);
         } else {
             return response()->json(['error' => 'Новая оценка больше чем установленное значение score'], 400);
@@ -135,9 +145,6 @@ class RatedController extends Controller
     public function getLessonData()
     {
 
-        $lessonsData = Lesson::with('lists')->get();
-
-        $responseData = [];
 
 
         $specificData = Rated::select('rateds.mark', 'rateds.user_id', 'lessons.date_of_lesson')
@@ -159,30 +166,33 @@ class RatedController extends Controller
         $laboratoryWork = $rated->laboratory_work_id;
         $laboratoryWork = LaboratoryWork::find($laboratoryWork);
 
-        if ($newMark == 0)  {
+        if ($newMark == 0) {
             $rated->delete();
             return response(null, Response::HTTP_NO_CONTENT);
         } else if (!$laboratoryWork) {
-            return response()->json(['error' => 'Лабораторная работа не найдена'], 404);
-           
-
-        } else{
-
-        $score = $laboratoryWork->maximum_score;
-
-        if (($newMark <= $score) && ($newMark > 0)) {
-
+            // return response()->json(['error' => 'Лабораторная работа не найдена'], 404);
             $rated->mark = $newMark;
             $rated->save();
-
             return new RatedResource($rated);
-        } else if ($newMark == 0) {
-            $rated->delete();
-            return response(null, Response::HTTP_NO_CONTENT);
 
         } else {
-            return response()->json(['error' => 'Новая оценка больше чем установленное значение score'], 400);
-        }}
+
+            $score = $laboratoryWork->maximum_score;
+
+            if (($newMark <= $score) && ($newMark > 0)) {
+
+                $rated->mark = $newMark;
+                $rated->save();
+
+                return new RatedResource($rated);
+            } else if ($newMark == 0) {
+                $rated->delete();
+                return response(null, Response::HTTP_NO_CONTENT);
+
+            } else {
+                return response()->json(['error' => 'Новая оценка больше чем установленное значение score'], 400);
+            }
+        }
     }
 
     /**
